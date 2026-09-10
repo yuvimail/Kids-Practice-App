@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kids Practice</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f4ff;min-height:100vh;font-size:18px}
+.screen{display:none;padding:20px;max-width:800px;margin:0 auto}
+.screen.active{display:block}
+h1{font-size:2rem;color:#2d3a8c;margin-bottom:10px}
+h2{font-size:1.5rem;color:#2d3a8c;margin-bottom:16px}
+h3{font-size:1.2rem;color:#444;margin-bottom:10px}
+.btn{display:inline-block;padding:16px 28px;border:none;border-radius:14px;font-size:1.1rem;cursor:pointer;font-weight:600;transition:transform .1s}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:#2d3a8c;color:#fff}
+.btn-success{background:#27ae60;color:#fff}
+.btn-danger{background:#e74c3c;color:#fff}
+.btn-outline{background:#fff;color:#2d3a8c;border:2px solid #2d3a8c}
+.btn-math{background:#7b2d8c;color:#fff}
+.btn-sm{padding:8px 16px;font-size:.95rem}
+.user-btn{width:100%;margin-bottom:14px;background:#fff;color:#2d3a8c;border:3px solid #2d3a8c;border-radius:18px;padding:22px;font-size:1.3rem;text-align:left;cursor:pointer;transition:background .15s}
+.user-btn:hover{background:#e8ecff}
+.card{background:#fff;border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.passage-text{line-height:1.8;color:#333;font-size:1.05rem;margin-bottom:20px}
+.question-block{background:#f8f9ff;border-radius:12px;padding:16px;margin-bottom:14px;border-left:4px solid #2d3a8c}
+.question-block.math-q{border-left-color:#7b2d8c}
+.question-block p{font-weight:600;margin-bottom:10px;color:#222}
+.mcq-option{display:block;width:100%;text-align:left;background:#fff;border:2px solid #ccd;border-radius:10px;padding:12px 16px;margin-bottom:8px;cursor:pointer;font-size:1rem;transition:border-color .15s,background .15s}
+.mcq-option:hover{border-color:#2d3a8c;background:#f0f4ff}
+.mcq-option.correct{background:#d4edda;border-color:#27ae60;color:#155724}
+.mcq-option.wrong{background:#f8d7da;border-color:#e74c3c;color:#721c24}
+.mcq-option.reveal{background:#d4edda;border-color:#27ae60}
+.fill-input{width:100%;padding:10px 14px;border:2px solid #ccd;border-radius:10px;font-size:1rem;margin-top:4px}
+.fill-input.correct{border-color:#27ae60;background:#d4edda}
+.fill-input.wrong{border-color:#e74c3c;background:#f8d7da}
+.short-input{width:100%;padding:10px 14px;border:2px solid #ccd;border-radius:10px;font-size:1rem;min-height:80px;resize:vertical;margin-top:4px}
+.model-answer{background:#fff8e1;border:1px solid #f0c040;border-radius:8px;padding:12px;margin-top:8px;font-size:.95rem;color:#555;display:none}
+.score-bar{background:#e8ecff;border-radius:12px;padding:16px;margin-bottom:16px;display:flex;align-items:center;gap:16px}
+.streak-badge{background:#ff9800;color:#fff;border-radius:50%;width:54px;height:54px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:700;flex-shrink:0}
+.mini-chart{display:flex;align-items:flex-end;gap:4px;height:40px}
+.mini-bar{width:22px;border-radius:4px 4px 0 0;background:#2d3a8c;opacity:.7;min-height:4px}
+.feedback-correct{color:#27ae60;font-weight:700;margin-top:6px}
+.feedback-wrong{color:#e74c3c;font-weight:700;margin-top:6px}
+.tag{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.8rem;font-weight:600;margin-left:8px}
+.tag-done{background:#d4edda;color:#155724}
+.tag-pending{background:#fff3cd;color:#856404}
+.nav-back{background:none;border:none;color:#2d3a8c;font-size:1rem;cursor:pointer;padding:6px 0;margin-bottom:16px;font-weight:600}
+.nav-back::before{content:"← "}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th{background:#2d3a8c;color:#fff;padding:10px 12px;text-align:left}
+td{padding:10px 12px;border-bottom:1px solid #eee}
+tr:hover td{background:#f8f9ff}
+.skill-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.skill-label{width:120px;font-size:.9rem;color:#555}
+.skill-track{flex:1;background:#eee;border-radius:6px;height:14px}
+.skill-fill{height:14px;border-radius:6px;background:#2d3a8c}
+.alert{padding:16px;border-radius:12px;margin-bottom:16px;font-size:1rem}
+.alert-info{background:#e8ecff;color:#2d3a8c;border:1px solid #b0bcf0}
+.alert-warn{background:#fff3cd;color:#856404;border:1px solid #f0c040}
+.pin-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:center;justify-content:center}
+.pin-overlay.active{display:flex}
+.pin-box{background:#fff;border-radius:16px;padding:30px;width:300px;text-align:center}
+.pin-input{width:100%;padding:12px;font-size:1.5rem;text-align:center;border:2px solid #ccd;border-radius:10px;margin:14px 0;letter-spacing:8px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.cal-day-hdr{font-size:.75rem;font-weight:600;color:#888;padding:4px 0}
+.cal-day{padding:8px 2px;border-radius:8px;font-size:1rem;border:2px solid transparent}
+.subject-banner{text-align:center;padding:10px;border-radius:12px;margin-bottom:16px;font-weight:700;font-size:1.1rem}
+.subject-eng{background:#e8ecff;color:#2d3a8c}
+.subject-math{background:#f3e8ff;color:#7b2d8c}
+select,input[type=date]{padding:8px 12px;border:2px solid #ccd;border-radius:8px;font-size:.95rem}
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- PIN Overlay -->
+<div class="pin-overlay" id="pinOverlay">
+  <div class="pin-box">
+    <h2>Admin Access</h2>
+    <input class="pin-input" type="password" id="pinInput" maxlength="6" placeholder="######">
+    <div id="pinError" style="color:#e74c3c;font-size:.9rem;min-height:20px"></div>
+    <button class="btn btn-primary" style="width:100%;margin-top:8px" onclick="checkPin()">Enter</button>
+    <button class="btn btn-outline btn-sm" style="width:100%;margin-top:10px" onclick="closePinOverlay()">Cancel</button>
+  </div>
+</div>
+
+<!-- Screen: Home -->
+<div class="screen active" id="screenHome">
+  <div style="text-align:center;padding:20px 0 10px">
+    <div style="font-size:3rem">📚</div>
+    <h1>Daily Practice</h1>
+    <p style="color:#666;margin-bottom:28px">Who is practising today?</p>
+  </div>
+  <div id="userButtons"></div>
+</div>
+
+<!-- Screen: Already Done -->
+<div class="screen" id="screenDone">
+  <div style="text-align:center;padding:30px 0">
+    <div style="font-size:3.5rem">🌟</div>
+    <h1 id="doneTitle">Great job!</h1>
+    <p id="doneMsg" style="color:#555;margin:12px 0 20px;font-size:1.1rem"></p>
+    <div id="doneScore" class="card" style="display:inline-block;min-width:200px;text-align:center"></div>
+  </div>
+  <div id="doneProgress" class="card" style="margin-top:20px"></div>
+  <div style="text-align:center;margin-top:20px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+    <button class="btn btn-outline" onclick="showScreen('screenHome')">Home</button>
+    <button class="btn btn-outline" onclick="openMyCalendar()">📅 My Calendar</button>
+  </div>
+</div>
+
+<!-- Screen: No Content -->
+<div class="screen" id="screenNoContent">
+  <div style="text-align:center;padding:40px 0">
+    <div style="font-size:3rem">📭</div>
+    <h2 style="margin:16px 0 10px">No content yet</h2>
+    <p id="noContentDetail" style="color:#666"></p>
+  </div>
+  <div style="text-align:center;margin-top:20px">
+    <button class="btn btn-outline" onclick="showScreen('screenHome')">Back</button>
+  </div>
+</div>
+
+<!-- Screen: Practice -->
+<div class="screen" id="screenPractice">
+  <button class="nav-back" onclick="showScreen('screenHome')">Home</button>
+  <div id="subjectBanner" class="subject-banner subject-eng"></div>
+  <div id="practiceProgress" class="score-bar"></div>
+  <div class="card">
+    <h2 id="passageTitle"></h2>
+    <div class="passage-text" id="passageText"></div>
+  </div>
+  <div id="questionsContainer"></div>
+  <div style="text-align:center;margin:20px 0">
+    <button class="btn btn-success" id="submitBtn" onclick="submitAnswers()">Submit Answers</button>
+  </div>
+</div>
+
+<!-- Screen: English Results (mid-session) -->
+<div class="screen" id="screenEngResults">
+  <div style="text-align:center;padding:20px 0">
+    <div style="font-size:3rem" id="engResultEmoji">🎉</div>
+    <h1 id="engResultTitle">Well done!</h1>
+    <div class="card" style="display:inline-block;min-width:220px;margin:16px 0;text-align:center">
+      <div style="font-size:2.5rem;font-weight:700;color:#2d3a8c" id="engResultScore"></div>
+      <div style="color:#666" id="engResultLabel"></div>
+    </div>
+  </div>
+  <div id="engResultProgress" class="card"></div>
+  <div style="text-align:center;margin:20px 0">
+    <div style="background:#f3e8ff;border-radius:16px;padding:20px;margin-bottom:16px">
+      <div style="font-size:2rem">🔢</div>
+      <p style="font-weight:700;color:#7b2d8c;margin:8px 0">English done! Now let us do Maths.</p>
+      <p style="color:#666;font-size:.95rem">Complete today's maths to finish your practice.</p>
+    </div>
+    <button class="btn btn-math" onclick="startMaths()">Start Maths →</button>
+    <button class="btn btn-outline" style="margin-left:10px" onclick="reviewAttempt(engRecord)">📋 Review Answers</button>
+  </div>
+</div>
+
+<!-- Screen: Final Results -->
+<div class="screen" id="screenResults">
+  <div style="text-align:center;padding:20px 0">
+    <div style="font-size:3rem" id="resultEmoji">🎉</div>
+    <h1 id="resultTitle">All done today!</h1>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:16px 0">
+      <div class="card" style="min-width:160px;text-align:center">
+        <div style="font-size:.85rem;color:#2d3a8c;font-weight:600;margin-bottom:4px">📖 English</div>
+        <div style="font-size:2rem;font-weight:700;color:#2d3a8c" id="finalEngScore"></div>
+        <div style="color:#666;font-size:.85rem" id="finalEngPct"></div>
+      </div>
+      <div class="card" style="min-width:160px;text-align:center">
+        <div style="font-size:.85rem;color:#7b2d8c;font-weight:600;margin-bottom:4px">🔢 Maths</div>
+        <div style="font-size:2rem;font-weight:700;color:#7b2d8c" id="finalMathScore"></div>
+        <div style="color:#666;font-size:.85rem" id="finalMathPct"></div>
+      </div>
+    </div>
+  </div>
+  <div id="resultProgress" class="card"></div>
+  <div style="text-align:center;margin:20px 0;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+    <button class="btn btn-primary" onclick="showScreen('screenHome')">Home</button>
+    <button class="btn btn-outline" onclick="openMyCalendar()">📅 My Calendar</button>
+    <button class="btn btn-outline" onclick="reviewAttempt(engRecord)">📋 Review English</button>
+    <button class="btn btn-outline" onclick="reviewAttempt(lastMathRecord)">📋 Review Maths</button>
+  </div>
+</div>
+
+<!-- Screen: Review Attempt -->
+<div class="screen" id="screenReview">
+  <button class="nav-back" id="reviewBackBtn" onclick="showScreen('screenHome')">Back</button>
+  <h2 id="reviewTitle">Answer Review</h2>
+  <div id="reviewContent"></div>
+</div>
+
+<!-- Screen: My Calendar -->
+<div class="screen" id="screenMyCalendar">
+  <button class="nav-back" onclick="showScreen('screenHome')">Home</button>
+  <h2 id="calTitle">My Attendance</h2>
+  <div id="myCalendarContent"></div>
+  <div id="myAttemptsContent" style="margin-top:16px"></div>
+  <div style="text-align:center;margin-top:16px">
+    <button class="btn btn-outline" onclick="showScreen('screenHome')">Back</button>
+  </div>
+</div>
+
+<!-- Screen: Admin Dashboard -->
+<div class="screen" id="screenAdmin">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+    <h1>Admin Dashboard</h1>
+    <button class="btn btn-outline btn-sm" onclick="showScreen('screenHome')">Exit</button>
+  </div>
+  <div id="adminContentInfo" class="alert alert-info" style="margin-bottom:16px"></div>
+  <div id="adminStudentList"></div>
+  <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;align-items:center">
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn btn-outline" onclick="exportData()">⬇️ Export Backup</button>
+      <label class="btn btn-outline" style="cursor:pointer;margin:0">⬆️ Import Backup<input type="file" accept=".json" style="display:none" onchange="importData(event)"></label>
+    </div>
+    <button class="btn btn-primary" onclick="openUserModal(null)">➕ Add User</button>
+  </div>
+</div>
+
+<!-- User Add/Edit Modal -->
+<div id="userModalOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:12px;padding:28px;width:320px;max-width:90vw;box-shadow:0 8px 32px rgba(0,0,0,.2)">
+    <h3 id="userModalTitle" style="margin-bottom:18px">Add User</h3>
+    <label style="display:block;margin-bottom:10px;font-size:.9rem">Name
+      <input id="userModalName" type="text" placeholder="Student name" style="display:block;width:100%;margin-top:4px;padding:8px;border:1px solid #ccc;border-radius:6px;font-size:1rem;box-sizing:border-box">
+    </label>
+    <label style="display:block;margin-bottom:18px;font-size:.9rem">Grade
+      <select id="userModalGrade" style="display:block;width:100%;margin-top:4px;padding:8px;border:1px solid #ccc;border-radius:6px;font-size:1rem;box-sizing:border-box">
+        <option value="4">Grade 4</option>
+        <option value="7">Grade 7</option>
+      </select>
+    </label>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn btn-outline" onclick="closeUserModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveUserModal()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Screen: Student Detail -->
+<div class="screen" id="screenStudentDetail">
+  <button class="nav-back" onclick="showScreen('screenAdmin')">Dashboard</button>
+  <h2 id="detailStudentName"></h2>
+  <div style="margin-bottom:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+    <label style="font-size:.9rem;color:#555">From: <input type="date" id="filterFrom"></label>
+    <label style="font-size:.9rem;color:#555">To: <input type="date" id="filterTo"></label>
+    <label style="font-size:.9rem;color:#555">Month:
+      <select id="filterMonth">
+        <option value="">All</option>
+        <option>january</option><option>february</option><option>march</option>
+        <option>april</option><option>may</option><option>june</option>
+        <option>july</option><option>august</option><option>september</option>
+        <option>october</option><option>november</option><option>december</option>
+      </select>
+    </label>
+    <button class="btn btn-primary btn-sm" onclick="renderStudentDetail(currentDetailId)">Apply</button>
+  </div>
+  <div id="detailContent"></div>
+  <div style="margin-top:20px">
+    <button class="btn btn-danger btn-sm" onclick="confirmReset()">Reset All Data</button>
+  </div>
+</div>
+
+<!-- Loader Overlay -->
+<div id="loaderOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;align-items:center;justify-content:center;flex-direction:column;gap:14px">
+  <div style="width:44px;height:44px;border:5px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin .8s linear infinite"></div>
+  <div id="loaderMsg" style="color:#fff;font-size:1rem;font-weight:600">Loading...</div>
+</div>
+
+</body>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwNr3bRKoMprnHtG4zeVEWGHhrJGGTR39Ss8Bzht8V-zALPlQTypPjTbpHoUsRs-SgOVg/exec';
+const USERS_KEY = "kids_users_data";
+const DEFAULT_USERS = [
+  { id:"u1", name:"Praneeth", grade:7 },
+  { id:"u2", name:"Kathir",   grade:4 }
+];
+let USERS = loadUsersLocal();
+function loadUsersLocal() {
+  try { const u = JSON.parse(localStorage.getItem(USERS_KEY)); return (Array.isArray(u) && u.length) ? u : JSON.parse(JSON.stringify(DEFAULT_USERS)); } catch(e) { return JSON.parse(JSON.stringify(DEFAULT_USERS)); }
+}
+const ADMINS = [{ id:"a1", name:"Admin" }];
+const ADMIN_PIN = "996633";
+const STORAGE_KEY = "kids_practice_data";
+
+// ── STATE ─────────────────────────────────────────────────
+let currentUser = null;
+let currentPassage = null;
+let sessionStart = null;
+let currentSubject = 'english';
+let engRecord = null;
+let lastMathRecord = null;
+let currentDetailId = null;
+let reviewBackScreen = 'screenHome';
+let _cachedRecords = null;
+
+// ── STORAGE (cloud-first, localStorage cache) ─────────────
+function loadData() {
+  if (_cachedRecords) return _cachedRecords;
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e) { return []; }
+}
+function saveData(d) {
+  _cachedRecords = d;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(d));
+}
+function saveUsers() {
+  localStorage.setItem(USERS_KEY, JSON.stringify(USERS));
+  apiPost({ action: 'saveUsers', users: USERS }).catch(() => {});
+}
+function todayStr() { return new Date().toISOString().slice(0,10); }
+function monthName() { return new Date().toLocaleString('en-US',{month:'long'}).toLowerCase(); }
+
+// ── CLOUD API ─────────────────────────────────────────────
+function apiGet(params) {
+  const qs = Object.entries(params).map(([k,v]) => k+'='+encodeURIComponent(v)).join('&');
+  return fetch(SCRIPT_URL + '?' + qs).then(r => r.json());
+}
+function apiPost(body) {
+  return fetch(SCRIPT_URL, { method:'POST', body: JSON.stringify(body) }).then(r => r.json());
+}
+function showLoader(msg) {
+  document.getElementById('loaderMsg').textContent = msg || 'Loading...';
+  document.getElementById('loaderOverlay').style.display = 'flex';
+}
+function hideLoader() { document.getElementById('loaderOverlay').style.display = 'none'; }
+function syncFromCloud(cb) {
+  if (!SCRIPT_URL || SCRIPT_URL.includes('YOUR_GOOGLE')) { cb(); return; }
+  showLoader('Syncing data...');
+  apiGet({ action: 'getAll' })
+    .then(res => {
+      if (res.records) { _cachedRecords = res.records; localStorage.setItem(STORAGE_KEY, JSON.stringify(res.records)); }
+      if (res.users && res.users.length) {
+        USERS.length = 0; res.users.forEach(u => USERS.push(u));
+        localStorage.setItem(USERS_KEY, JSON.stringify(USERS));
+      }
+      hideLoader(); cb();
+    })
+    .catch(() => { hideLoader(); cb(); });
+}
+function dayIndex() { return new Date().getDate() - 1; } // 0-based
+
+// ── CONTENT LOADER (cloud) ────────────────────────────────
+const _passageCache = {};
+
+function loadEnglish(user, cb) { fetchPassage('content', user.grade, cb); }
+function loadMaths(user, cb)   { fetchPassage('maths',   user.grade, cb); }
+
+function fetchPassage(subject, grade, cb) {
+  const month = monthName();
+  const idx   = dayIndex();
+  const key   = subject + '_' + grade + '_' + month;
+  if (_passageCache[key]) { cb(_passageCache[key][idx] || _passageCache[key][0] || null); return; }
+  if (!SCRIPT_URL || SCRIPT_URL.includes('YOUR_GOOGLE')) { cb(null); return; }
+  showLoader('Loading content...');
+  apiGet({ action: 'getContent', subject: subject, grade: grade, month: month })
+    .then(function(res) {
+      hideLoader();
+      if (res.passages) { _passageCache[key] = res.passages; cb(res.passages[idx] || res.passages[0] || null); }
+      else { cb(null); }
+    })
+    .catch(function() { hideLoader(); cb(null); });
+}
+
+// ── SCREEN ROUTER ─────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ── HOME ──────────────────────────────────────────────────
+function renderHome() {
+  const container = document.getElementById('userButtons');
+  container.innerHTML = '';
+  const data = loadData();
+  const today = todayStr();
+  USERS.forEach(u => {
+    const engDone  = data.some(r => r.student_id === u.id && r.date === today && r.subject === 'english');
+    const mathDone = data.some(r => r.student_id === u.id && r.date === today && r.subject === 'maths');
+    const allDone  = engDone && mathDone;
+    const btn = document.createElement('button');
+    btn.className = 'user-btn';
+    btn.innerHTML = '<span style="font-size:1.5rem">👤</span> <strong>' + u.name + '</strong>'
+      + ' <span style="color:#888;font-size:.9rem">Grade ' + u.grade + '</span>'
+      + (allDone  ? '<span class="tag tag-done">✓ Done today</span>' : '')
+      + (!allDone && engDone  ? '<span class="tag" style="background:#e8ecff;color:#2d3a8c">📖 Eng done</span>' : '')
+      + (!allDone && mathDone ? '<span class="tag" style="background:#f3e8ff;color:#7b2d8c">🔢 Math done</span>' : '');
+    btn.onclick = () => selectUser(u);
+    container.appendChild(btn);
+  });
+  ADMINS.forEach(a => {
+    const btn = document.createElement('button');
+    btn.className = 'user-btn';
+    btn.style.borderColor = '#888';
+    btn.innerHTML = '<span style="font-size:1.5rem">🔑</span> <strong>' + a.name + '</strong>'
+      + ' <span style="color:#888;font-size:.9rem">Admin</span>';
+    btn.onclick = () => openPinOverlay();
+    container.appendChild(btn);
+  });
+}
+
+// ── USER SELECTION ────────────────────────────────────────
+function selectUser(user) {
+  currentUser = user;
+  syncFromCloud(function() {
+    const data = loadData();
+    const today = todayStr();
+    const engDone  = data.some(r => r.student_id === user.id && r.date === today && r.subject === 'english');
+    const mathDone = data.some(r => r.student_id === user.id && r.date === today && r.subject === 'maths');
+    if (engDone && mathDone) { showDoneScreen(data); return; }
+    if (engDone && !mathDone) { startMaths(); return; }
+    currentSubject = 'english';
+    loadEnglish(user, function(passage) {
+      if (!passage) {
+        document.getElementById('noContentDetail').textContent =
+          'No English content for Grade ' + user.grade + ' today. Please add content_grade' + user.grade + '.js.';
+        showScreen('screenNoContent');
+        return;
+      }
+      currentPassage = passage;
+      sessionStart = Date.now();
+      renderPractice();
+    });
+  });
+}
+
+function startMaths() {
+  currentSubject = 'maths';
+  loadMaths(currentUser, function(passage) {
+    if (!passage) {
+      document.getElementById('noContentDetail').textContent =
+        'No Maths content for Grade ' + currentUser.grade + ' today. Please add math_grade' + currentUser.grade + '.js.';
+      showScreen('screenNoContent');
+      return;
+    }
+    currentPassage = passage;
+    sessionStart = Date.now();
+    renderPractice();
+  });
+}
+
+// ── PRACTICE ──────────────────────────────────────────────
+function renderPractice() {
+  const isMath = currentSubject === 'maths';
+  const banner = document.getElementById('subjectBanner');
+  banner.className = 'subject-banner ' + (isMath ? 'subject-math' : 'subject-eng');
+  banner.textContent = isMath ? '🔢 Maths' : '📖 English';
+
+  const data = loadData();
+  const attempts = data.filter(r => r.student_id === currentUser.id);
+  document.getElementById('practiceProgress').innerHTML = buildProgressStrip(attempts);
+  document.getElementById('passageTitle').textContent = currentPassage.title;
+  document.getElementById('passageText').textContent = currentPassage.text || '';
+
+  const container = document.getElementById('questionsContainer');
+  container.innerHTML = '';
+  currentPassage.questions.forEach((q, i) => {
+    const block = document.createElement('div');
+    block.className = 'question-block' + (isMath ? ' math-q' : '');
+    block.id = 'qblock_' + i;
+    if (q.type === 'mcq') {
+      block.innerHTML = '<p>Q' + (i+1) + '. ' + q.q + '</p>'
+        + q.options.map(o => '<button class="mcq-option" data-qi="' + i + '" data-val="' + o + '" onclick="selectMCQ(this)">' + o + '</button>').join('');
+    } else if (q.type === 'fill_blank') {
+      block.innerHTML = '<p>Q' + (i+1) + '. ' + q.q + '</p><input class="fill-input" id="fill_' + i + '" placeholder="Type your answer...">';
+    } else {
+      block.innerHTML = '<p>Q' + (i+1) + '. ' + q.q + '</p>'
+        + '<textarea class="short-input" id="short_' + i + '" placeholder="Write your answer..."></textarea>'
+        + '<div class="model-answer" id="model_' + i + '"><strong>Model Answer:</strong> ' + q.answer + '</div>';
+    }
+    container.appendChild(block);
+  });
+
+  document.getElementById('submitBtn').style.display = 'inline-block';
+  document.getElementById('submitBtn').disabled = false;
+  showScreen('screenPractice');
+}
+
+function selectMCQ(btn) {
+  const qi = btn.dataset.qi;
+  document.querySelectorAll('.mcq-option[data-qi="' + qi + '"]').forEach(b => {
+    b.classList.remove('selected');
+    b.style.borderColor = '';
+    b.style.background = '';
+  });
+  btn.classList.add('selected');
+  btn.style.borderColor = '#2d3a8c';
+  btn.style.background = '#e8ecff';
+}
+
+// ── SUBMIT ────────────────────────────────────────────────
+function submitAnswers() {
+  const qs = currentPassage.questions;
+  let score = 0;
+  const perQ = [];
+
+  qs.forEach((q, i) => {
+    const block = document.getElementById('qblock_' + i);
+    if (q.type === 'mcq') {
+      const sel = block.querySelector('.mcq-option.selected');
+      const given = sel ? sel.dataset.val : null;
+      const correct = given === q.answer;
+      block.querySelectorAll('.mcq-option').forEach(b => {
+        b.disabled = true;
+        if (b.dataset.val === q.answer) b.classList.add('reveal');
+        else if (b.classList.contains('selected') && !correct) b.classList.add('wrong');
+      });
+      if (correct) score++;
+      perQ.push({ skill: q.skill, correct: !!correct, given: given || '', expected: q.answer });
+    } else if (q.type === 'fill_blank') {
+      const inp = document.getElementById('fill_' + i);
+      const given = (inp.value || '').trim();
+      const correct = given.toLowerCase() === q.answer.toLowerCase();
+      inp.disabled = true;
+      inp.classList.add(correct ? 'correct' : 'wrong');
+      const fb = document.createElement('div');
+      fb.className = correct ? 'feedback-correct' : 'feedback-wrong';
+      fb.textContent = correct ? '✓ Correct!' : '✗ Correct answer: ' + q.answer;
+      inp.parentNode.appendChild(fb);
+      if (correct) score++;
+      perQ.push({ skill: q.skill, correct, given, expected: q.answer });
+    } else {
+      const given = (document.getElementById('short_' + i).value || '').trim();
+      document.getElementById('model_' + i).style.display = 'block';
+      perQ.push({ skill: q.skill, correct: null, given, expected: q.answer });
+    }
+  });
+
+  const autoGraded = qs.filter(q => q.type !== 'short').length;
+  const timeTaken = Math.round((Date.now() - sessionStart) / 1000);
+  const record = {
+    student_id: currentUser.id,
+    date: todayStr(),
+    month: monthName(),
+    subject: currentSubject,
+    passage_id: currentPassage.id,
+    passage_title: currentPassage.title,
+    questions_snapshot: currentPassage.questions.map(q => ({ type: q.type, q: q.q, options: q.options || null, answer: q.answer })),
+    score, total_questions: autoGraded,
+    per_question_results: perQ,
+    time_taken_seconds: timeTaken
+  };
+  const data = loadData();
+  data.push(record);
+  saveData(data);
+  apiPost({ action: 'saveRecord', record }).catch(() => {});
+
+  document.getElementById('submitBtn').style.display = 'none';
+
+  if (currentSubject === 'english') {
+    engRecord = record;
+    setTimeout(() => showEngResults(record, data), 1000);
+  } else {
+    lastMathRecord = record;
+    setTimeout(() => showFinalResults(record, data), 1000);
+  }
+}
+
+// ── ENGLISH RESULTS ───────────────────────────────────────
+function showEngResults(record, data) {
+  const pct = record.total_questions ? Math.round(record.score / record.total_questions * 100) : 0;
+  document.getElementById('engResultEmoji').textContent = pct >= 80 ? '🎉' : pct >= 50 ? '👍' : '💪';
+  document.getElementById('engResultTitle').textContent = pct >= 80 ? 'Excellent!' : pct >= 50 ? 'Good effort!' : 'Keep going!';
+  document.getElementById('engResultScore').textContent = record.score + '/' + record.total_questions;
+  document.getElementById('engResultLabel').textContent = pct + '%  ·  English';
+  const attempts = data.filter(r => r.student_id === currentUser.id);
+  document.getElementById('engResultProgress').innerHTML = buildProgressStrip(attempts);
+  showScreen('screenEngResults');
+}
+
+// ── FINAL RESULTS ─────────────────────────────────────────
+function showFinalResults(mathRecord, data) {
+  const ep = engRecord && engRecord.total_questions ? Math.round(engRecord.score / engRecord.total_questions * 100) : 0;
+  const mp = mathRecord.total_questions ? Math.round(mathRecord.score / mathRecord.total_questions * 100) : 0;
+  const avg = Math.round((ep + mp) / 2);
+  document.getElementById('resultEmoji').textContent = avg >= 80 ? '🎉' : avg >= 50 ? '👍' : '💪';
+  document.getElementById('resultTitle').textContent = avg >= 80 ? 'Brilliant work today!' : avg >= 50 ? 'Good effort today!' : 'Keep practising!';
+  if (engRecord) {
+    document.getElementById('finalEngScore').textContent = engRecord.score + '/' + engRecord.total_questions;
+    document.getElementById('finalEngPct').textContent = ep + '%';
+  }
+  document.getElementById('finalMathScore').textContent = mathRecord.score + '/' + mathRecord.total_questions;
+  document.getElementById('finalMathPct').textContent = mp + '%';
+  const attempts = data.filter(r => r.student_id === currentUser.id);
+  document.getElementById('resultProgress').innerHTML = buildProgressStrip(attempts);
+  showScreen('screenResults');
+}
+
+// ── DONE SCREEN ───────────────────────────────────────────
+// ── REVIEW ATTEMPT ───────────────────────────────────────
+function reviewAttempt(record, backScreen) {
+  if (!record) return;
+  reviewBackScreen = backScreen || 'screenHome';
+  document.getElementById('reviewBackBtn').onclick = () => showScreen(reviewBackScreen);
+  const subj = record.subject === 'english' ? '📖 English' : '🔢 Maths';
+  const pct = record.total_questions ? Math.round(record.score / record.total_questions * 100) : 0;
+  document.getElementById('reviewTitle').textContent = subj + ' — ' + (record.passage_title || record.passage_id) + ' (' + record.date + ')';
+  const qs = record.questions_snapshot || [];
+  const perQ = record.per_question_results || [];
+  if (!qs.length) {
+    document.getElementById('reviewContent').innerHTML = '<div class="alert alert-warn">No question detail saved for this attempt.</div>';
+    showScreen('screenReview');
+    return;
+  }
+  let html = '<div class="card" style="text-align:center;margin-bottom:16px">'
+    + '<span style="font-size:1.8rem;font-weight:700;color:#2d3a8c">' + record.score + '/' + record.total_questions + '</span>'
+    + ' <span style="color:#666">(' + pct + '%)</span>'
+    + ' &nbsp;·&nbsp; <span style="color:#888;font-size:.9rem">' + Math.floor(record.time_taken_seconds/60) + 'm ' + record.time_taken_seconds%60 + 's</span>'
+    + '</div>';
+  qs.forEach((q, i) => {
+    const res = perQ[i] || {};
+    const correct = res.correct;
+    const given = res.given || '';
+    const expected = res.expected || q.answer;
+    let statusIcon = correct === null ? '✏️' : correct ? '✅' : '❌';
+    let bg = correct === null ? '#fff8e1' : correct ? '#d4edda' : '#f8d7da';
+    let border = correct === null ? '#f0c040' : correct ? '#27ae60' : '#e74c3c';
+    html += '<div class="question-block" style="background:' + bg + ';border-left-color:' + border + ';margin-bottom:12px">';
+    html += '<p style="margin-bottom:10px">' + statusIcon + ' <strong>Q' + (i+1) + '.</strong> ' + q.q + '</p>';
+    if (q.type === 'mcq') {
+      (q.options || []).forEach(opt => {
+        const isCorrect = opt === expected;
+        const isGiven = opt === given;
+        const style = isCorrect
+          ? 'background:#d4edda;border-color:#27ae60;color:#155724'
+          : (isGiven && !isCorrect ? 'background:#f8d7da;border-color:#e74c3c;color:#721c24' : '');
+        const label = isCorrect ? ' ✓' : (isGiven && !isCorrect ? ' ✗' : '');
+        html += '<div style="padding:8px 14px;border:2px solid #ccd;border-radius:8px;margin-bottom:6px;font-size:.95rem;' + style + '">' + opt + label + '</div>';
+      });
+    } else if (q.type === 'fill_blank') {
+      html += '<div style="font-size:.95rem;margin-bottom:4px">Your answer: <strong style="color:' + (correct?'#27ae60':'#e74c3c') + '">' + (given || '<em>blank</em>') + '</strong></div>';
+      if (!correct) html += '<div style="font-size:.95rem">Correct answer: <strong style="color:#27ae60">' + expected + '</strong></div>';
+    } else {
+      html += '<div style="font-size:.95rem;margin-bottom:6px">Your answer: <em style="color:#555">' + (given || '<em>no answer</em>') + '</em></div>';
+      html += '<div style="background:#fff;border-radius:8px;padding:10px;font-size:.9rem;color:#555"><strong>Model answer:</strong> ' + expected + '</div>';
+    }
+    html += '</div>';
+  });
+  document.getElementById('reviewContent').innerHTML = html;
+  showScreen('screenReview');
+}
+
+function showDoneScreen(data) {
+  const today = todayStr();
+  const er = data.find(r => r.student_id === currentUser.id && r.date === today && r.subject === 'english');
+  const mr = data.find(r => r.student_id === currentUser.id && r.date === today && r.subject === 'maths');
+  document.getElementById('doneTitle').textContent = 'Hi ' + currentUser.name + '! 👋';
+  document.getElementById('doneMsg').textContent = "You have completed both English and Maths today. Come back tomorrow!";
+  const ep = er && er.total_questions ? Math.round(er.score / er.total_questions * 100) : 0;
+  const mp = mr && mr.total_questions ? Math.round(mr.score / mr.total_questions * 100) : 0;
+  document.getElementById('doneScore').innerHTML =
+    '<div style="display:flex;gap:16px;justify-content:center">'
+    + '<div><div style="font-size:1.5rem;font-weight:700;color:#2d3a8c">' + (er ? er.score + '/' + er.total_questions : '-') + '</div><div style="color:#666;font-size:.85rem">📖 English (' + ep + '%)</div></div>'
+    + '<div><div style="font-size:1.5rem;font-weight:700;color:#7b2d8c">' + (mr ? mr.score + '/' + mr.total_questions : '-') + '</div><div style="color:#666;font-size:.85rem">🔢 Maths (' + mp + '%)</div></div>'
+    + '</div>';
+  const attempts = data.filter(r => r.student_id === currentUser.id);
+  document.getElementById('doneProgress').innerHTML = buildProgressStrip(attempts);
+  showScreen('screenDone');
+}
+
+// ── PROGRESS STRIP ────────────────────────────────────────
+function buildProgressStrip(attempts) {
+  const streak = calcStreak(attempts);
+  const last7 = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const ds = d.toISOString().slice(0,10);
+    const a = attempts.filter(r => r.date === ds);
+    const avg = a.length ? Math.round(a.reduce((s,r) => s + (r.total_questions ? r.score/r.total_questions*100 : 0), 0) / a.length) : null;
+    last7.push(avg);
+  }
+  const bars = last7.map(v => {
+    if (v === null) return '<div class="mini-bar" style="height:4px;background:#ddd"></div>';
+    return '<div class="mini-bar" style="height:' + Math.max(4, Math.round(v*0.4)) + 'px" title="' + v + '%"></div>';
+  }).join('');
+  return '<div class="streak-badge">🔥' + streak + '</div>'
+    + '<div><div style="font-weight:600;color:#2d3a8c">Streak: ' + streak + ' day' + (streak!==1?'s':'') + '</div>'
+    + '<div style="font-size:.85rem;color:#666;margin-bottom:4px">Last 7 days</div>'
+    + '<div class="mini-chart">' + bars + '</div></div>';
+}
+
+function calcStreak(attempts) {
+  let streak = 0, d = new Date();
+  while (true) {
+    const ds = d.toISOString().slice(0,10);
+    const dayAttempts = attempts.filter(r => r.date === ds);
+    const engDone  = dayAttempts.some(r => r.subject === 'english');
+    const mathDone = dayAttempts.some(r => r.subject === 'maths');
+    if (engDone && mathDone) { streak++; d.setDate(d.getDate()-1); }
+    else break;
+  }
+  return streak;
+}
+
+// ── INIT ──────────────────────────────────────────────────
+renderHome();
+</script>
+
+<script>
+// ── PIN ───────────────────────────────────────────────────
+function openPinOverlay() {
+  document.getElementById('pinInput').value = '';
+  document.getElementById('pinError').textContent = '';
+  document.getElementById('pinOverlay').classList.add('active');
+  setTimeout(() => document.getElementById('pinInput').focus(), 100);
+}
+function closePinOverlay() { document.getElementById('pinOverlay').classList.remove('active'); }
+function checkPin() {
+  if (document.getElementById('pinInput').value === ADMIN_PIN) {
+    closePinOverlay(); renderAdmin(); showScreen('screenAdmin');
+  } else {
+    document.getElementById('pinError').textContent = 'Incorrect PIN. Try again.';
+    document.getElementById('pinInput').value = '';
+  }
+}
+document.getElementById('pinInput').addEventListener('keydown', e => { if (e.key === 'Enter') checkPin(); });
+
+// ── STUDENT CALENDAR ──────────────────────────────────────
+function openMyCalendar() {
+  const data = loadData().filter(r => r.student_id === currentUser.id);
+  const doneDays = new Set(
+    [...new Set(data.map(r => r.date))].filter(d => {
+      const eng  = data.some(r => r.date === d && r.subject === 'english');
+      const math = data.some(r => r.date === d && r.subject === 'maths');
+      return eng && math;
+    })
+  );
+  const streak = calcStreak(data);
+  document.getElementById('calTitle').textContent = currentUser.name + "'s Attendance";
+  document.getElementById('myCalendarContent').innerHTML =
+    '<div class="card" style="text-align:center">'
+    + '<div style="font-size:2rem;font-weight:700;color:#2d3a8c">' + doneDays.size + '</div>'
+    + '<div style="color:#666">full days completed this month</div>'
+    + '<div style="margin-top:8px;font-size:1.1rem">🔥 ' + streak + ' day streak</div>'
+    + '</div>'
+    + '<div class="card">' + buildCalendarHTML(doneDays)
+    + '<div style="display:flex;gap:16px;margin-top:10px;font-size:.8rem;color:#888">'
+    + '<span><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#2d3a8c;vertical-align:middle"></span> Both done</span>'
+    + '<span><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#e8ecff;vertical-align:middle"></span> Missed</span>'
+    + '</div></div>';
+  // Attempts history table
+  const sorted = [...data].sort((a,b) => b.date.localeCompare(a.date));
+  let tbl = '<div class="card"><h3 style="margin-bottom:12px">My Attempts</h3>';
+  if (!sorted.length) {
+    tbl += '<p style="color:#888">No attempts yet.</p>';
+  } else {
+    tbl += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.9rem">'
+      + '<thead><tr style="background:#f0f4ff">'
+      + '<th style="padding:8px;text-align:left">Date</th>'
+      + '<th style="padding:8px;text-align:left">Subject</th>'
+      + '<th style="padding:8px;text-align:left">Topic</th>'
+      + '<th style="padding:8px;text-align:center">Score</th>'
+      + '<th style="padding:8px"></th>'
+      + '</tr></thead><tbody>';
+    sorted.forEach((r, idx) => {
+      const rIdx = data.indexOf(r);
+      tbl += '<tr style="border-bottom:1px solid #eee">'
+        + '<td style="padding:8px">' + r.date + '</td>'
+        + '<td style="padding:8px;text-transform:capitalize">' + r.subject + '</td>'
+        + '<td style="padding:8px">' + (r.passage_title || r.passage_id || '-') + '</td>'
+        + '<td style="padding:8px;text-align:center">' + r.score + '/' + r.total_questions + '</td>'
+        + '<td style="padding:8px;text-align:center">'
+        + '<button class="btn btn-outline btn-sm" style="padding:4px 10px;font-size:.8rem" onclick="reviewAttemptByIndex(\''+currentUser.id+'\','+rIdx+',\'screenMyCalendar\')">View</button>'
+        + '</td></tr>';
+    });
+    tbl += '</tbody></table></div>';
+  }
+  tbl += '</div>';
+  document.getElementById('myAttemptsContent').innerHTML = tbl;
+  showScreen('screenMyCalendar');
+}
+
+function buildCalendarHTML(doneDays) {
+  const today = new Date();
+  const yr = today.getFullYear(), mo = today.getMonth();
+  const label = today.toLocaleString('en-US', { month:'long', year:'numeric' });
+  const firstDay = new Date(yr, mo, 1).getDay();
+  const daysInMonth = new Date(yr, mo+1, 0).getDate();
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  let html = '<p style="font-weight:600;color:#2d3a8c;margin-bottom:10px;font-size:1.1rem">' + label + '</p>';
+  html += '<div class="cal-grid">';
+  days.forEach(d => { html += '<div class="cal-day-hdr">' + d + '</div>'; });
+  for (let i = 0; i < firstDay; i++) html += '<div></div>';
+  for (let d = 1; d <= daysInMonth; d++) {
+    const ds = yr + '-' + String(mo+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+    const done = doneDays.has(ds);
+    const isToday = d === today.getDate();
+    const future = new Date(yr, mo, d) > today;
+    const bg = future ? 'transparent' : done ? '#2d3a8c' : '#e8ecff';
+    const color = done ? '#fff' : future ? '#ccc' : '#555';
+    const border = isToday ? '2px solid #2d3a8c' : '2px solid transparent';
+    html += '<div class="cal-day" style="background:' + bg + ';color:' + color + ';border:' + border + ';font-weight:' + (done?700:400) + '">' + d + '</div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+// ── ADMIN ─────────────────────────────────────────────────
+// ── EXPORT / IMPORT ──────────────────────────────────────
+function exportData() {
+  const payload = { users: USERS, records: loadData(), exported: new Date().toISOString() };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'kids_backup_' + todayStr() + '.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const payload = JSON.parse(e.target.result);
+      if (!payload.users || !payload.records) throw new Error('Invalid backup file.');
+      if (!confirm('This will REPLACE all current data with the backup. Continue?')) return;
+      USERS.length = 0;
+      payload.users.forEach(u => USERS.push(u));
+      localStorage.setItem(USERS_KEY, JSON.stringify(USERS));
+      _cachedRecords = payload.records;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload.records));
+      showLoader('Uploading to cloud...');
+      apiPost({ action: 'importAll', users: USERS, records: payload.records })
+        .catch(() => {})
+        .finally(() => { hideLoader(); renderAdmin(); });
+      alert('Import successful! ' + payload.records.length + ' records and ' + payload.users.length + ' users loaded.');
+    } catch(err) { alert('Import failed: ' + err.message); }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+// ── USER MANAGEMENT ────────────────────────────────────────
+let _userModalEditId = null;
+let _userModalBackScreen = null;
+function openUserModal(uid, backScreen) {
+  _userModalEditId = uid || null;
+  _userModalBackScreen = backScreen || null;
+  const modal = document.getElementById('userModalOverlay');
+  if (uid) {
+    const u = USERS.find(u => u.id === uid);
+    document.getElementById('userModalTitle').textContent = 'Edit User';
+    document.getElementById('userModalName').value = u.name;
+    document.getElementById('userModalGrade').value = String(u.grade);
+  } else {
+    document.getElementById('userModalTitle').textContent = 'Add User';
+    document.getElementById('userModalName').value = '';
+    document.getElementById('userModalGrade').value = '4';
+  }
+  modal.style.display = 'flex';
+}
+function closeUserModal() {
+  document.getElementById('userModalOverlay').style.display = 'none';
+}
+function saveUserModal() {
+  const name = document.getElementById('userModalName').value.trim();
+  const grade = parseInt(document.getElementById('userModalGrade').value);
+  if (!name) { alert('Please enter a name.'); return; }
+  if (_userModalEditId) {
+    const u = USERS.find(u => u.id === _userModalEditId);
+    u.name = name; u.grade = grade;
+  } else {
+    const newId = 'u' + Date.now();
+    USERS.push({ id: newId, name, grade });
+  }
+  saveUsers();
+  closeUserModal();
+  if (_userModalBackScreen === 'screenStudentDetail') {
+    renderStudentDetail(_userModalEditId);
+  } else {
+    renderAdmin();
+  }
+}
+
+function renderAdmin() {
+  const data = loadData();
+  const today = todayStr();
+  document.getElementById('adminContentInfo').innerHTML =
+    '📂 Month: <strong>' + monthName() + '</strong> &nbsp;|&nbsp; Day index: <strong>' + (dayIndex()+1) + '</strong>'
+    + ' &nbsp;|&nbsp; Files: content_grade4.js, content_grade7.js, math_grade4.js, math_grade7.js';
+  const container = document.getElementById('adminStudentList');
+  container.innerHTML = '<h3 style="margin-bottom:12px">Students</h3>';
+  const table = document.createElement('table');
+  table.innerHTML = '<thead><tr><th>Name</th><th>Grade</th><th>Streak</th><th>Last Active</th><th>Today</th><th></th></tr></thead>';
+  const tbody = document.createElement('tbody');
+  USERS.forEach(u => {
+    const attempts = data.filter(r => r.student_id === u.id);
+    const streak = calcStreak(attempts);
+    const last = attempts.slice().sort((a,b) => b.date.localeCompare(a.date))[0];
+    const engDone  = attempts.some(r => r.date === today && r.subject === 'english');
+    const mathDone = attempts.some(r => r.date === today && r.subject === 'maths');
+    const status = engDone && mathDone ? 'Done' : engDone ? 'Eng only' : mathDone ? 'Math only' : 'Pending';
+    const tagClass = engDone && mathDone ? 'tag-done' : 'tag-pending';
+    const tr = document.createElement('tr');
+    tr.innerHTML = '<td><strong>' + u.name + '</strong></td><td>Grade ' + u.grade + '</td>'
+      + '<td>🔥 ' + streak + '</td><td>' + (last ? last.date : '—') + '</td>'
+      + '<td><span class="tag ' + tagClass + '">' + status + '</span></td>'
+      + '<td style="display:flex;gap:6px"><button class="btn btn-outline btn-sm" onclick="openStudentDetail(\'' + u.id + '\')">Details</button>'
+      + '<button class="btn btn-outline btn-sm" onclick="openUserModal(\'' + u.id + '\')">Edit</button></td>';
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  container.appendChild(table);
+}
+
+function openStudentDetail(uid) {
+  currentDetailId = uid;
+  document.getElementById('filterFrom').value = '';
+  document.getElementById('filterTo').value = '';
+  document.getElementById('filterMonth').value = '';
+  renderStudentDetail(uid);
+  showScreen('screenStudentDetail');
+}
+
+function renderStudentDetail(uid) {
+  const user = USERS.find(u => u.id === uid);
+  document.getElementById('detailStudentName').innerHTML = user.name + ' — Grade ' + user.grade
+    + ' <button class="btn btn-outline btn-sm" style="margin-left:10px;font-size:.8rem" onclick="openUserModal(\'' + uid + '\',\'screenStudentDetail\')">Edit</button>';
+  let data = loadData().filter(r => r.student_id === uid);
+  const from = document.getElementById('filterFrom').value;
+  const to   = document.getElementById('filterTo').value;
+  const mon  = document.getElementById('filterMonth').value;
+  if (from) data = data.filter(r => r.date >= from);
+  if (to)   data = data.filter(r => r.date <= to);
+  if (mon)  data = data.filter(r => r.month === mon);
+  data.sort((a,b) => a.date.localeCompare(b.date));
+  const container = document.getElementById('detailContent');
+  if (!data.length) { container.innerHTML = '<div class="alert alert-warn">No attempts found.</div>'; return; }
+
+  const uniqueDays = [...new Set(data.map(r => r.date))].length;
+  const firstDate = data[0].date, lastDate = data[data.length-1].date;
+  const totalDays = Math.max(1, Math.round((new Date(lastDate)-new Date(firstDate))/86400000)+1);
+
+  // skill accuracy
+  const skills = {};
+  data.forEach(r => (r.per_question_results||[]).forEach(q => {
+    if (q.correct === null) return;
+    if (!skills[q.skill]) skills[q.skill] = {c:0,t:0};
+    skills[q.skill].t++;
+    if (q.correct) skills[q.skill].c++;
+  }));
+  const skillBars = Object.entries(skills).map(([sk,v]) => {
+    const pct = Math.round(v.c/v.t*100);
+    return '<div class="skill-row"><div class="skill-label">' + sk.replace('_',' ') + '</div>'
+      + '<div class="skill-track"><div class="skill-fill" style="width:' + pct + '%"></div></div>'
+      + '<div style="font-size:.85rem;color:#555;width:40px">' + pct + '%</div></div>';
+  }).join('');
+
+  // score trend SVG
+  const svgW=560,svgH=100,pad=30;
+  const scores = data.map(r => r.total_questions ? Math.round(r.score/r.total_questions*100) : 0);
+  const n = scores.length;
+  let svgC = '';
+  if (n > 1) {
+    const pts = scores.map((s,i) => (pad+(i/(n-1))*(svgW-pad*2)) + ',' + (svgH-pad-(s/100)*(svgH-pad*2))).join(' ');
+    svgC = '<polyline points="' + pts + '" fill="none" stroke="#2d3a8c" stroke-width="2.5" stroke-linejoin="round"/>';
+    scores.forEach((s,i) => {
+      const x=pad+(i/(n-1))*(svgW-pad*2), y=svgH-pad-(s/100)*(svgH-pad*2);
+      svgC += '<circle cx="'+x+'" cy="'+y+'" r="4" fill="#2d3a8c"/>';
+      svgC += '<text x="'+x+'" y="'+(y-8)+'" text-anchor="middle" font-size="10" fill="#555">'+s+'%</text>';
+    });
+  }
+  const trendSVG = '<svg viewBox="0 0 '+svgW+' '+svgH+'" style="width:100%;max-width:'+svgW+'px;height:'+svgH+'px;overflow:visible">'
+    + '<line x1="'+pad+'" y1="'+(svgH-pad)+'" x2="'+(svgW-pad)+'" y2="'+(svgH-pad)+'" stroke="#ddd" stroke-width="1"/>'
+    + '<line x1="'+pad+'" y1="'+pad+'" x2="'+pad+'" y2="'+(svgH-pad)+'" stroke="#ddd" stroke-width="1"/>'
+    + svgC + '</svg>';
+
+  // calendar
+  const attemptDates = new Set(
+    [...new Set(data.map(r => r.date))].filter(d => {
+      const eng  = data.some(r => r.date === d && r.subject === 'english');
+      const math = data.some(r => r.date === d && r.subject === 'maths');
+      return eng && math;
+    })
+  );
+  const calToday = new Date();
+  const calY = calToday.getFullYear(), calM = calToday.getMonth();
+  const mLabel = calToday.toLocaleString('en-US',{month:'long',year:'numeric'});
+  const fDay = new Date(calY,calM,1).getDay();
+  const dim = new Date(calY,calM+1,0).getDate();
+  const dNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  let calHTML = '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center">';
+  dNames.forEach(d => { calHTML += '<div style="font-size:.75rem;font-weight:600;color:#888;padding:4px 0">'+d+'</div>'; });
+  for (let i=0;i<fDay;i++) calHTML += '<div></div>';
+  for (let d=1;d<=dim;d++) {
+    const ds = calY+'-'+String(calM+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    const done = attemptDates.has(ds);
+    const isT = d===calToday.getDate();
+    const fut = new Date(calY,calM,d)>calToday;
+    calHTML += '<div style="padding:6px 2px;border-radius:8px;background:'+(fut?'transparent':done?'#2d3a8c':'#e8ecff')+';color:'+(done?'#fff':fut?'#ccc':'#555')+';font-size:.9rem;font-weight:'+(done?700:400)+';border:'+(isT?'2px solid #2d3a8c':'2px solid transparent')+'">'+d+'</div>';
+  }
+  calHTML += '</div>';
+
+  container.innerHTML =
+    '<div class="card"><h3>Summary</h3><p>Total attempts: <strong>'+data.length+'</strong> &nbsp;|&nbsp; Active days: <strong>'+uniqueDays+'/'+totalDays+'</strong></p></div>'
+    + '<div class="card"><h3>Score Trend</h3>'+trendSVG+'</div>'
+    + '<div class="card"><h3>Skill Accuracy</h3>'+(skillBars||'<p style="color:#888">No data yet.</p>')+'</div>'
+    + '<div class="card"><h3>Attendance — '+mLabel+'</h3>'+calHTML
+    + '<div style="display:flex;gap:16px;margin-top:10px;font-size:.8rem;color:#888">'
+    + '<span><span style="display:inline-block;width:14px;height:14px;border-radius:4px;background:#2d3a8c;vertical-align:middle"></span> Both done</span>'
+    + '<span><span style="display:inline-block;width:14px;height:14px;border-radius:4px;background:#e8ecff;vertical-align:middle"></span> Missed</span>'
+    + '</div></div>'
+    + '<div class="card"><h3>Attempt History</h3><table>'
+    + '<thead><tr><th>Date</th><th>Subject</th><th>Passage</th><th>Score</th><th>Time</th><th></th></tr></thead><tbody>'
+    + data.slice().reverse().map((r,idx2) => {
+        const rIdx = data.length - 1 - idx2;
+        return '<tr><td>'+r.date+'</td>'
+        + '<td><span style="font-size:.8rem;padding:2px 8px;border-radius:10px;background:'+(r.subject==='english'?'#e8ecff':'#f3e8ff')+';color:'+(r.subject==='english'?'#2d3a8c':'#7b2d8c')+'">'+(r.subject==='english'?'📖 Eng':'🔢 Math')+'</span></td>'
+        + '<td style="font-size:.85rem">'+(r.passage_title||r.passage_id)+'</td>'
+        + '<td>'+r.score+'/'+r.total_questions+'</td>'
+        + '<td>'+Math.floor(r.time_taken_seconds/60)+'m '+r.time_taken_seconds%60+'s</td>'
+        + '<td style="display:flex;gap:4px">'
+        + '<button class="btn btn-outline btn-sm" style="padding:4px 10px;font-size:.8rem" onclick="reviewAttemptByIndex(\''+uid+'\','+rIdx+',\'screenStudentDetail\')">View</button>'
+        + '<button class="btn btn-danger btn-sm" style="padding:4px 10px;font-size:.8rem" onclick="deleteAttempt(\''+uid+'\',\''+r.date+'\',\''+r.subject+'\',\''+r.passage_id+'\')">✕</button>'
+        + '</td></tr>';
+      }).join('')
+    + '</tbody></table></div>';
+}
+
+function reviewAttemptByIndex(uid, idx, backScreen) {
+  const data = loadData().filter(r => r.student_id === uid);
+  data.sort((a,b) => a.date.localeCompare(b.date));
+  const record = data[idx];
+  if (record) reviewAttempt(record, backScreen);
+}
+
+function deleteAttempt(uid, date, subject, passageId) {
+  if (!confirm('Delete ' + subject + ' attempt on ' + date + '?')) return;
+  let all = loadData();
+  const idx = all.findIndex(r => r.student_id===uid && r.date===date && r.subject===subject && r.passage_id===passageId);
+  if (idx !== -1) {
+    all.splice(idx,1); saveData(all);
+    apiPost({ action: 'deleteRecord', student_id: uid, date, subject }).catch(() => {});
+  }
+  renderStudentDetail(uid);
+}
+
+function confirmReset() {
+  if (confirm('Delete ALL student data? This cannot be undone.')) {
+    _cachedRecords = [];
+    localStorage.removeItem(STORAGE_KEY);
+    apiPost({ action: 'importAll', users: USERS, records: [] }).catch(() => {});
+    alert('All data reset.');
+    renderAdmin();
+  }
+}
+</script>
+</html>
